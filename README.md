@@ -4,51 +4,93 @@
   <img src="https://github.com/pomke/fickle/blob/master/docs/fickle.png?raw=true" alt="Fickle Logo"/>
 </p>
 
-# Fickle objects, with multiple observer contexts.
+## Fickle objects, with multiple observer contexts.
 
 Fickle is intended for situations where there are multiple contexts for 
 receiving notifications about changes, with different requirements such
 as time-base batch processing, verification of recipt and different change-set
 formats.
 
-Fickle has three simple concepts, models, contexts and formatters.
+Fickle has two very simple concepts: 
 
-Fickle objects uses the same dot-path notation and getter/setter API as [object-path](https://github.com/mariocasciaro/object-path)
-which it uses internally.
+### Models 
+
+A model is an object with setters and getters:
+
+````javascript
+var ink = fickle({
+    name : 'shadow',
+    hue : '#333',
+    ml : 200,
+    stats : { views : 0 },
+    tags : ['monochrome'] });
+
+// single value set
+ink.set('name', 'smoke');
+
+// multi value set
+ink.set({'stats.views' : 1, 'ml' : 80});
+
+// increment views by 2
+ink.increment('stats.views', 2);
+
+// decrement views by 1
+ink.decrement('stats.views', 1);
+
+// get stats
+ink.get('stats') // -> { views : 2 }
+
+// push a value onto an array
+ink.push('tags', 'special');
+ink.get('tags'); // -> ['monochrome', 'special']
+
+// insert a value at a given index of an array
+ink.insert('tags', 'dark', 0);
+ink.get('tags'); // -> ['dark', 'monochrome', 'special']
+
+// 'empty' a value: reduces a string to '', an object to {}, an array to []
+ink.empty('tags');
+ink.get('tags'); // -> []
+
+// delete a value
+ink.del('stats.views') 
+ink.get('stats'); // -> {}
+````
+
+### Contexts
+
+In Fickle, models are observed through an 'Observer Context'. Contexts 
+determine the manner in which observers are updated, and provite methods
+for registering observer functions.
 
 
 ````javascript 
 var ink = fickle({
-    name : 'shadow'
+    name : 'shadow',
     hue : '#333',
     ml : 200,
-    tags : ['monochrome']});
+    stats : { views : 0 },
+    tags : ['monochrome'] });
+
+// A default context updates as soon as changes come in, this is great for
+// connecting to view logic.
+var viewCtx = fickle.context(); 
+
+// A batching context is useful when updating the server, this one updates
+// observers at a maximum frequency of 5 seconds
+serverCtx = fickle.context({
+    cacheTime : 5000
 });
 
-// a context for updating client views
-view = fickle.context(); 
-
-// a context for updating the server, has a timeout and 
-// requires verification that updates have been processed
-// before clearing their dirty flag for this context.
-server = fickle.context({
-    cacheTime : 1000,
-    verify : true
-});
-
-// observe a specific key path
-view.on(ink, 'name', function(obj, name) { 
+// observe a specific key path on an object with 'on'
+viewCtx.on(ink, 'name', function(obj, name) { 
     console.log("name changed to", name); 
 });
 
 // observe any changes
-server.onAny(ink, function(obj, changes, callback) { 
+serverCtx.onAny(ink, function(obj, changes) { 
     console.log("saving fields:", changes); 
-    
     //save changes to server ...
-
-    // callback array of verified fields to clear dirty flag on
-    return callback(Object.keys(changes));
 });
 
 // set and get some values..
@@ -56,15 +98,16 @@ ink.set('name', 'slate');
 ink.set({name : 'silver', hue : '#777'});
 ink.get("ml");
 
-// clearing a context unbinds all observers
-server.clear();
-
 // output:
-
 name changed to slate
 name changed to silver
 saving fields: {'name' : 'silver', 'hue' : '#777'}
 200
+
+
+// clearing a context unbinds observers
+viewCtx.clear(ink);
+serverCtx.clearAll();
 ````
 
     
