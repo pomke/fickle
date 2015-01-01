@@ -1,0 +1,33 @@
+{
+  "name": "fickle",
+  "version": "0.0.1",
+  "description": "Fickle objects, with multiple observer contexts.",
+  "main": "index.js",
+  "directories": {
+    "doc": "docs"
+  },
+  "scripts": {
+    "test": "mocha test.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/pomke/fickle.git"
+  },
+  "keywords": [
+    "model",
+    "observer",
+    "rivets"
+  ],
+  "author": "Pomke",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/pomke/fickle/issues"
+  },
+  "homepage": "https://github.com/pomke/fickle",
+  "dependencies": {
+    "object-path": "^0.8.1"
+  },
+  "devDependencies": {
+    "mocha": "^2.1.0"
+  }
+}

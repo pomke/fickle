@@ -4,11 +4,17 @@
   <img src="https://github.com/pomke/fickle/blob/master/docs/fickle.png?raw=true" alt="Fickle Logo"/>
 </p>
 
-# An object with multiple observer contexts.
+# Fickle objects, with multiple observer contexts.
 
 Fickle is intended for situations where there are multiple contexts for 
 receiving notifications about changes, with different requirements such
-as time-base batch processing and verification of recipt.
+as time-base batch processing, verification of recipt and different change-set
+formats.
+
+Fickle has three simple concepts, models, contexts and formatters.
+
+Fickle objects uses the same dot-path notation and getter/setter API as [object-path](https://github.com/mariocasciaro/object-path)
+which it uses internally.
 
 
 ````javascript 
