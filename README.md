@@ -31,12 +31,12 @@ server = fickle.context({
 });
 
 // observe a specific key path
-ink.on(view, 'name', function(name) { 
+view.on(ink, 'name', function(name) { 
     console.log("name changed to", name); 
 });
 
-// observe all changes
-ink.on(server, function(obj, changes, callback) { 
+// observe any changes
+server.onAny(ink, function(obj, changes, callback) { 
     console.log("saving fields:", changes); 
     
     //save changes to server ...
@@ -49,6 +49,9 @@ ink.on(server, function(obj, changes, callback) {
 ink.set('name', 'slate');
 ink.set({name : 'silver', hue : '#777'});
 ink.get("ml");
+
+// clearing a context unbinds all observers
+server.clear();
 
 // output:
 
