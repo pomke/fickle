@@ -31,7 +31,7 @@ server = fickle.context({
 });
 
 // observe a specific key path
-view.on(ink, 'name', function(name) { 
+view.on(ink, 'name', function(obj, name) { 
     console.log("name changed to", name); 
 });
 
