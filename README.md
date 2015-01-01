@@ -1,7 +1,7 @@
 
 
 <p align="center">
-  <img src="https://github.com/pomke/fickle/blob/master/docs/fickle.png?raw=true" alt="Sublime's custom image"/>
+  <img src="https://github.com/pomke/fickle/blob/master/docs/fickle.png?raw=true" alt="Fickle Logo"/>
 </p>
 
 # An object with multiple observer contexts.
