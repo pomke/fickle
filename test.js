@@ -77,24 +77,64 @@ describe("Fickle Models", function() {
 
 describe("Fickle Contexts", function() {
 
-    var context;
+    var context, context2, context3;
+
     var ink = fickle({
         name : 'shadow',
         hue : '#333',
         ml : 200,
         stats : { views : 0 },
-        tags : ['monochrome'] 
+        tags : ['monochrome']
     });
-    
-    it("Can create a context.", function(done) {
+
+    var pink = fickle({
+        name : 'pink',
+        hue : '#3c1',
+        ml : 80,
+        stats : { views : 0 },
+        tags : ['valentine']
+    });
+
+    var r = {}; //test results
+
+    function stash(testName, done) {
+        return function(obj, val) {
+            r[testName] = {obj:obj, val:val};
+            if(done) return done();
+        };
+    }
+
+    it("Can create a default context.", function(done) {
         context = fickle.context();
-        context.on(ink, 'name', function() { console.log(arguments); });
-        ink.set('name', 'blue');
-        ink.set({'name' : 'blue', ml : 300, tinted : true});
-        ink.del('tinted');
         done();
     });
 
+    it("Can create a cached context.", function(done) {
+        context2 = fickle.context({ cacheTime : 1000 });
+        done();
+    });
+    
+    it("Can create a cached context with changelog format.", function(done) {
+        context3 = fickle.context({ cacheTime : 1000, format : "changelog" });
+        done();
+    });
+
+    it("Can catch an immediate change.", function(done) {
+        context.on(ink, 'name', stash('immediate', function(){
+            assert.equal(r.immediate.val, 'blue');
+            done();
+        }));
+        ink.set('name', 'blue');
+        context.clear(ink);
+    });
+
+/*
+        context2.onAny(ink, function(obj, val) { console.log("EVERYTHING",val); done(); });
+        ink.set('name', 'blue');
+        ink.set({'name' : 'green', ml : 300, tinted : true});
+        ink.del('tinted');
+
+       */
 
 
 

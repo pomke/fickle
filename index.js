@@ -109,9 +109,8 @@ function Context(opts) {
 
     function pushObs(obj, path, cb) {
         var objID = obj._id;
-        var paths = observers[objID] ? observers[objID] : observers[objID] = {}; 
-        var obs = paths[path] ? paths[path] : paths[path] = [];
-        if(!obs[path]) obs[path] = [];
+        var paths = observers[objID] || (observers[objID] = {});
+        var obs = paths[path] || (paths[path] = []);
         obs.push(cb);
     }
 
@@ -143,7 +142,7 @@ function Context(opts) {
 
         // stage changes in cache before propagating to observers
         if(!cache[objID]) cache[objID] = {};
-        var stage = cache[objID];
+        var stage = cache[objID]; //stage is the cache for this objID
         Object.keys(changes).forEach(function(k) {
             if(!stage[k]) stage[k] = [];
             stage[k].push([now, method, changes[k]]);
@@ -160,20 +159,50 @@ function Context(opts) {
 
     self._propagate = function() {
         // process cache, send results to observers
-
         //for each object we have changes cached for..
+
         Object.keys(cache).forEach(function(objID) {
             var changes = cache[objID]; //changes for this object
 
             //for each registered observer path for this object..
             Object.keys(observers[objID]).forEach(function(path) {
+                //If we have changes for this path..
+                var obs = observers[objID][path];
+                if(changes[path]) {
+                    //notify all observers for path
+                    obs.forEach(function(observer) {
+                        observer(watching[objID], changes[path][changes[path].length-1][2]);
+                    });
+                }
+                if(path === "*") {
+                    //catch all! respond with everything
+                    obs.forEach(function(observer) {
+                        var out;
+                        switch(format) {
+                            case 'rolled':
+                                // rolled format, latest changed values
+                                out = {};
+                                Object.keys(changes).forEach(function(k) {
+                                    out[k] = changes[k][changes[k].length-1][2];
+                                });
+                                break;
+                            case 'changelog':
+                                // changelog format, array of changes
+                                out = [];
+                                Object.keys(changes).forEach(function(k) {
+                                    changes[k].forEach(function(change) {
+                                        out.push([change[0], change[1], k, change[2]]);
+                                    });
+                                });
+                                break;
+                        }
 
-                if(changes[path]) console.log("MATCHES", path, changes[path]);
-                var obs = observers[objID][path]; //observers for path
-
-                
+                        observer(watching[objID], out);
+                    });
+                }
             });
         });
+        cache = {}; //Finished propagating, clear cached changes
     };
 
     // Connect obj and context
