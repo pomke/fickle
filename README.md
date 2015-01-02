@@ -1,7 +1,7 @@
 
 
 <p align="center">
-  [Fickle Logo](https://github.com/pomke/fickle/blob/master/docs/fickle.png?raw=true)
+[Fickle Logo](https://github.com/pomke/fickle/blob/master/docs/fickle.png?raw=true)
 </p>
 
 ## Fickle objects, with multiple observer contexts.
