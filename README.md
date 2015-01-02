@@ -1,6 +1,6 @@
 
 
-![Fickle Logo](https://github.com/pomke/fickle/blob/master/docs/fickle.png?raw=true)
+![Fickle Logo](https://raw.githubusercontent.com/pomke/fickle/master/docs/fickle.png)
 
 ## Fickle objects, with multiple observer contexts.
 
