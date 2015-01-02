@@ -1,6 +1,6 @@
 {
   "name": "fickle",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "Fickle objects, with multiple observer contexts.",
   "main": "index.js",
   "directories": {

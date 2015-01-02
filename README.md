@@ -1,10 +1,12 @@
 
 
 <p align="center">
-  <img src="https://github.com/pomke/fickle/blob/master/docs/fickle.png?raw=true" alt="Fickle Logo"/>
+  ![Fickle Logo](https://github.com/pomke/fickle/blob/master/docs/fickle.png?raw=true)
 </p>
 
 ## Fickle objects, with multiple observer contexts.
+
+[![build status](https://secure.travis-ci.org/pomke/fickle.png)](http://travis-ci.org/pomke/fickle)
 
 Fickle is intended for situations where there are multiple contexts for 
 receiving notifications about changes, with different requirements such
