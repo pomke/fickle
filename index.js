@@ -145,25 +145,32 @@ function Context(opts) {
         if(!cache[objID]) cache[objID] = {};
         var stage = cache[objID];
         Object.keys(changes).forEach(function(k) {
-            if(!stage[k]) cache[k] = [];
+            if(!stage[k]) stage[k] = [];
             stage[k].push([now, method, changes[k]]);
         });
 
         if(!cacheTime || (last && now > (last + cacheTime))) {
             // propagate changes
-            self.propagate();
+            self._propagate();
         } else {
             // set a timer for the next send
-            setTimeout(self.propagate, (last + cacheTime) - now);
+            setTimeout(self._propagate, (last + cacheTime) - now);
         }
     };
 
     self._propagate = function() {
         // process cache, send results to observers
+
+        //for each object we have changes cached for..
         Object.keys(cache).forEach(function(objID) {
             var changes = cache[objID]; //changes for this object
+
+            //for each registered observer path for this object..
             Object.keys(observers[objID]).forEach(function(path) {
+
+                if(changes[path]) console.log("MATCHES", path, changes[path]);
                 var obs = observers[objID][path]; //observers for path
+
                 
             });
         });
