@@ -8,8 +8,7 @@
 
 Fickle is intended for situations where there are multiple contexts for 
 receiving notifications about changes, with different requirements such
-as time-base batch processing, verification of recipt and different change-set
-formats.
+as time-base batch processing, different change-set formats etc.
 
 Fickle has two very simple concepts: 
 
@@ -60,7 +59,7 @@ ink.get('stats'); // -> {}
 ### Contexts
 
 In Fickle, models are observed through an 'Observer Context'. Contexts 
-determine the manner in which observers are updated, and provite methods
+determine the manner in which observers are updated, and provide methods
 for registering observer functions.
 
 
@@ -104,6 +103,9 @@ name changed to silver
 saving fields: {'name' : 'silver', 'hue' : '#777'}
 200
 
+// pausing a context stops it receiving any updates
+viewCtx.pause(true);
+viewCtx.pause(false);
 
 // clearing a context unbinds observers
 viewCtx.clear(ink);

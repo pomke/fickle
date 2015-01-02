@@ -8,27 +8,18 @@ module.exports.context = function(opts) {
     return new Context(opts);
 };
 
-
 function Fickle(obj) {
     var id;
     var self = this;
     id = self._id = mkID();
     var data = obj || {};
     var contexts = {}; //Contexts to update
-    var setters = {
-        set : partial(op.set, data),
-        del : partial(op.del, data),
-        empty : partial(op.empty, data),
-        insert : partial(op.insert, data),
-        push : partial(op.push, data)
-    }
 
-
-    //Getters:
+    // Getters:
     self.get = partial(op.get, data);
     self.exists = partial(op.has, data);
 
-    //Modifiers:
+    // Modifiers:
     self.set = setter('set');
     self.del = setter('del');
     self.empty = setter('empty');
@@ -37,7 +28,15 @@ function Fickle(obj) {
     self.increment = setter('increment');
     self.decrement = setter('decrement');
 
-    //Internals:
+    // Internals:
+    var setters = {
+        set : partial(op.set, data),
+        del : partial(op.del, data),
+        empty : partial(op.empty, data),
+        insert : partial(op.insert, data),
+        push : partial(op.push, data)
+    };
+
     self._hook = function(ctxID, ctx) {
         contexts[ctxID] = ctx;
         return id;
@@ -101,28 +100,74 @@ function Context(opts) {
     var self = this;
     var id = mkID();
     var cacheTime = opts.cacheTime || 0;
-    var verify = opts.verify || false;
+    var cache = {};
+    var format = opts.format || 'rolled';
     var watching = {}; // objects being watched
+    var observers = {};
+    var paused = false;
+    var last;
+
+    function pushObs(obj, path, cb) {
+        var objID = obj._id;
+        var paths = observers[objID] ? observers[objID] : observers[objID] = {}; 
+        var obs = paths[path] ? paths[path] : paths[path] = [];
+        if(!obs[path]) obs[path] = [];
+        obs.push(cb);
+    }
 
     self.on = function(obj, path, cb) {
         hookObj(obj);
+        pushObs(obj, path, cb);
     };
 
     self.onAny = function(obj, cb) {
-
+        hookObj(obj);
+        pushObs(obj, '*', cb);
     };
 
     self.clear = function(obj) {
-
+        //TODO
     };
 
     self.clearAll = function() {
+        //TODO
+    };
 
+    self.pause = function(bool) {
+        paused = bool;
     };
 
     self._changes = function(objID, method, changes) {
-        console.log(objID, method, changes);
-    }
+        if(paused) return; 
+        var now = new Date().getTime();
+
+        // stage changes in cache before propagating to observers
+        if(!cache[objID]) cache[objID] = {};
+        var stage = cache[objID];
+        Object.keys(changes).forEach(function(k) {
+            if(!stage[k]) cache[k] = [];
+            stage[k].push([now, method, changes[k]]);
+        });
+
+        if(!cacheTime || (last && now > (last + cacheTime))) {
+            // propagate changes
+            self.propagate();
+        } else {
+            // set a timer for the next send
+            setTimeout(self.propagate, (last + cacheTime) - now);
+        }
+    };
+
+    self._propagate = function() {
+        // process cache, send results to observers
+        Object.keys(cache).forEach(function(objID) {
+            var changes = cache[objID]; //changes for this object
+            Object.keys(observers[objID]).forEach(function(path) {
+                var obs = observers[objID][path]; //observers for path
+                
+            });
+        });
+    };
 
     // Connect obj and context
     function hookObj(obj) {
